@@ -14,44 +14,61 @@ class Transition(object):
 
     @staticmethod
     def left_arc(conf, relation):
-        """
-            :param configuration: is the current configuration
-            :return : A new configuration or -1 if the pre-condition is not satisfied
-        """
-        raise NotImplementedError('Please implement left_arc!')
-        return -1
+        """Adds the arc (b, relation, s) to A, and pops Sigma. That is, draw an arc between the next node on the buffer and the next node on the stack, with the label relation"""
+        if not conf.buffer or not conf.stack:
+            return -1
+        else:
+            b = conf.buffer[0]
+            s = conf.stack[-1]
+            # preconditions:
+            # s is not the artificial root node 0
+            if s == 0:
+                return -1
+            # and does not already have a head
+            for item in conf.arcs:
+                if item[2] == s:
+                    return -1
+
+            conf.buffer.pop(0)
+            conf.stack.pop()
+            conf.arcs.append((b, relation, s))
+
 
     @staticmethod
     def right_arc(conf, relation):
-        """
-            :param configuration: is the current configuration
-            :return : A new configuration or -1 if the pre-condition is not satisfied
-        """
+        """Adds the arc (s, relation, b) to A, and pushes b onto Sigma"""
         if not conf.buffer or not conf.stack:
             return -1
+        else:
+            s = conf.stack[-1]
+            b = conf.buffer.pop(0)
+            conf.stack.append(b)
+            conf.arcs.append((s, relation, b))
 
-        # You get this one for free! Use it as an example.
-
-        idx_wi = conf.stack[-1]
-        idx_wj = conf.buffer.pop(0)
-
-        conf.stack.append(idx_wj)
-        conf.arcs.append((idx_wi, relation, idx_wj))
 
     @staticmethod
     def reduce(conf):
-        """
-            :param configuration: is the current configuration
-            :return : A new configuration or -1 if the pre-condition is not satisfied
-        """
-        raise NotImplementedError('Please implement reduce!')
-        return -1
+        """Pops Sigma"""
+        if not conf.buffer:
+            return -1
+        else:
+            s = conf.stack[-1]
+            # precondition: s has a head
+            hasHead = False
+            for item in conf.arcs:
+                if item[2] == s:
+                    hasHead = True
+
+            if hasHead:
+                conf.stack.pop()
+            else:
+                return -1
+
 
     @staticmethod
     def shift(conf):
-        """
-            :param configuration: is the current configuration
-            :return : A new configuration or -1 if the pre-condition is not satisfied
-        """
-        raise NotImplementedError('Please implement shift!')
-        return -1
+        """Removes b from B and adds it to Sigma"""
+        if not conf.buffer:
+            return -1
+        else:
+            conf.stack.append(conf.buffer.pop(0))
