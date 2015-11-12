@@ -22,16 +22,17 @@ class Transition(object):
             s = conf.stack[-1]
             # preconditions:
             # s is not the artificial root node 0
-            if s == 0:
-                return -1
-            # and does not already have a head
-            for item in conf.arcs:
-                if item[2] == s:
-                    return -1
+            if s != 0:
+                # and does not already have a head
+                hasHead = False
+                for item in conf.arcs:
+                    if item[2] == s:
+                        hasHead = True
 
-            conf.buffer.pop(0)
-            conf.stack.pop()
-            conf.arcs.append((b, relation, s))
+                if not hasHead:
+                    #conf.buffer.pop(0)
+                    conf.stack.pop()
+                    conf.arcs.append((b, relation, s))
 
 
     @staticmethod
@@ -49,7 +50,7 @@ class Transition(object):
     @staticmethod
     def reduce(conf):
         """Pops Sigma"""
-        if not conf.buffer:
+        if not conf.buffer or not conf.stack:
             return -1
         else:
             s = conf.stack[-1]
@@ -61,8 +62,6 @@ class Transition(object):
 
             if hasHead:
                 conf.stack.pop()
-            else:
-                return -1
 
 
     @staticmethod
